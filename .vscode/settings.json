@@ -1,0 +1,4 @@
+{
+    "appService.defaultWebAppToDeploy": "/subscriptions/b8c1209d-59c5-4100-a4ef-fc03fbec1d9d/resourceGroups/ResourceGroup2/providers/Microsoft.Web/sites/ase-chatbot-nodejs",
+    "appService.deploySubpath": "."
+}
