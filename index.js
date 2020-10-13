@@ -1,6 +1,3 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
-// Licensed under the MIT License.
-
 const path = require('path');
 
 const dotenv = require('dotenv');
@@ -11,11 +8,11 @@ dotenv.config({ path: ENV_FILE });
 const restify = require('restify');
 
 // Import required bot services.
-// See https://aka.ms/bot-services to learn more about the different parts of a bot.
-const { BotFrameworkAdapter } = require('botbuilder');
+const { BotFrameworkAdapter, MemoryStorage, UserState, ConversationState  } = require('botbuilder');
 
 // This bot's main dialog.
 const { MyBot } = require('./bot');
+const { MainDialog } = require('./dialogs/mainDialog');
 
 // Create HTTP server
 const server = restify.createServer();
@@ -33,6 +30,14 @@ const adapter = new BotFrameworkAdapter({
     channelService: process.env.ChannelService,
     openIdMetadata: process.env.BotOpenIdMetadata
 });
+
+// Define state store for your bot.
+// See https://aka.ms/about-bot-state to learn more about bot state.
+const memoryStorage = new MemoryStorage();
+
+// Create user and conversation state with in-memory storage provider.
+const userState = new UserState(memoryStorage);
+const conversationState = new ConversationState(memoryStorage);
 
 // Map knowledge base endpoint values from .env file into the required format for `QnAMaker`.
 const configuration = {
@@ -65,7 +70,9 @@ const onTurnErrorHandler = async (context, error) => {
 adapter.onTurnError = onTurnErrorHandler;
 
 // Create the main dialog.
-const myBot = new MyBot(configuration, {});
+// const myBot = new MyBot(configuration, {});
+const dialog = new MainDialog(userState);
+const myBot = new MyBot(conversationState, userState, dialog, configuration, {});
 
 // Listen for incoming requests.
 server.post('/api/messages', (req, res) => {
