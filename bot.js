@@ -51,10 +51,22 @@ class MyBot extends ActivityHandler {
                 }
             ];
 
+            const text2 = "So let's start our little chat. Firstly, I want to ask you a few questions just to see how you're doing. Would you like to get started?";
+            const cardActions2 = [
+                {
+                    type: ActionTypes.PostBack,
+                    title: 'Alright',
+                    value: '1',
+                },
+            ];
+
             switch(value) {
+                case 0:
+                    await context.sendActivity(MessageFactory.suggestedActions(cardActions2, text2));
+                    value += 1;
+                    break;
                 case 1:
                     await context.sendActivity(`What is your name?`);
-                    var responseMessage = context.activity.text;
                     value += 1;
                     break;
                 case 2:
@@ -120,19 +132,10 @@ class MyBot extends ActivityHandler {
         this.onMembersAdded(async (context, next) => {
             const membersAdded = context.activity.membersAdded;
             const welcomeText = "Hi there! Welcome to MindSpace - an AI Chatbot to help you be a better version of yourself. MindSpace promotes better mental health through mindful practices. Please be reminded that MindSpace cannot be replaced for a human counsellor.";
-            const text2 = "So let's start our little chat. Firstly, I want to ask you a few questions just to see how you're doing. Would you like to get started?";
-            const cardActions = [
-                {
-                    type: ActionTypes.PostBack,
-                    title: 'Alright',
-                    value: '1',
-                },
-            ];
             for (let cnt = 0; cnt < membersAdded.length; ++cnt) {
                 if (membersAdded[cnt].id !== context.activity.recipient.id) {
                     await context.sendActivity(MessageFactory.text(welcomeText, welcomeText));
-                    await context.sendActivity(MessageFactory.suggestedActions(cardActions, text2));
-                    global.value = 1;
+                    global.value = 0;
                 }
             }
             // By calling next() you ensure that the next BotHandler is run.
