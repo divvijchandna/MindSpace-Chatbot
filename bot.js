@@ -24,7 +24,6 @@ class MyBot extends ActivityHandler {
         this.dialogState = this.conversationState.createProperty('DialogState');
         this.qnaMaker = new QnAMaker(configuration, qnaOptions);
 
-        var value = 1;
         var user = new UserProfile();
         this.onMessage(async (context, next) => {
             console.log('Running dialog with Message Activity.');
@@ -133,6 +132,7 @@ class MyBot extends ActivityHandler {
                 if (membersAdded[cnt].id !== context.activity.recipient.id) {
                     await context.sendActivity(MessageFactory.text(welcomeText, welcomeText));
                     await context.sendActivity(MessageFactory.suggestedActions(cardActions, text2));
+                    global.value = 1;
                 }
             }
             // By calling next() you ensure that the next BotHandler is run.
