@@ -69,9 +69,18 @@ const onTurnErrorHandler = async (context, error) => {
 // Set the onTurnError for the singleton BotFrameworkAdapter.
 adapter.onTurnError = onTurnErrorHandler;
 
+var endpointHostName = process.env.QnAEndpointHostName;
+if (!endpointHostName.startsWith('https://')) {
+    endpointHostName = 'https://' + endpointHostName;
+}
+
+if (!endpointHostName.includes('/v5.0') && !endpointHostName.endsWith('/qnamaker')) {
+    endpointHostName = endpointHostName + '/qnamaker';
+}
+
 // Create the main dialog.
 // const myBot = new MyBot(configuration, {});
-const dialog = new MainDialog(userState);
+const dialog = new MainDialog(process.env.QnAKnowledgebaseId, process.env.QnAAuthKey, endpointHostName, userState);
 const myBot = new MyBot(conversationState, userState, dialog, configuration, {});
 
 // Listen for incoming requests.

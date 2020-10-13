@@ -1,6 +1,8 @@
 const { ActivityHandler, MessageFactory } = require('botbuilder');
 const { QnAMaker } = require('botbuilder-ai');
 const { ActionTypes } = require('botframework-schema');
+const { UserProfile } = require('./userProfile');
+const { NumberPrompt, TextPrompt } = require('botbuilder-dialogs');
 
 class MyBot extends ActivityHandler {
     /**
@@ -23,25 +25,93 @@ class MyBot extends ActivityHandler {
         this.qnaMaker = new QnAMaker(configuration, qnaOptions);
 
         var value = 1;
+        var user = new UserProfile();
         this.onMessage(async (context, next) => {
             console.log('Running dialog with Message Activity.');
-            if (value == 12) {
-                // send user input to QnA Maker.
-                const qnaResults = await this.qnaMaker.getAnswers(context);
 
-                // If an answer was received from QnA Maker, send the answer back to the user.
-                if (qnaResults[0]) {
-                    await context.sendActivity(`${ qnaResults[0].answer}`);
+            const cardActions = [
+                {
+                    type: ActionTypes.PostBack,
+                    title: '0 - Not at all',
+                    value: '0',
+                },
+                {
+                    type: ActionTypes.PostBack,
+                    title: '1 - Several days',
+                    value: '1',
+                },
+                {
+                    type: ActionTypes.PostBack,
+                    title: '2 - More than half the days.',
+                    value: '2',
+                },
+                {
+                    type: ActionTypes.PostBack,
+                    title: '3 - Nearly every day',
+                    value: '3',
                 }
-                else {
-                    // If no answers were returned from QnA Maker, reply with help.
-                    await context.sendActivity("Sorry, I couldn't understand you there.");
-                }
-            }
-            else {
-                // Run the Dialog with the new message Activity.
-                await this.dialog.run(context, this.dialogState);
-                value += 1;
+            ];
+
+            switch(value) {
+                case 1:
+                    await context.sendActivity(`What is your name?`);
+                    var responseMessage = context.activity.text;
+                    value += 1;
+                    break;
+                case 2:
+                    user.name = context.activity.text;
+                    await context.sendActivity(`${ context.activity.text }. That's a really nice name!`);
+                    await context.sendActivity(`To get started, Please answer the following questions by typing the corresponding number for each of the options. Over the last two weeks, how often have you been bothered by any of the following problems?`);
+                    await context.sendActivity(MessageFactory.suggestedActions(cardActions, 'Little interest or pleasure in doing things.'));
+                    value += 1;
+                    break;
+                case 3:
+                    user.score += parseInt(context.activity.text);
+                    await context.sendActivity(MessageFactory.suggestedActions(cardActions, 'Feeling down, depressed, or hopeless.'));
+                    value += 1;
+                    break;
+                case 4:
+                    user.score += parseInt(context.activity.text);
+                    await context.sendActivity(MessageFactory.suggestedActions(cardActions, 'Trouble falling or staying asleep, or sleeping too much.'));
+                    value += 1;
+                    break;
+                case 5:
+                    user.score += parseInt(context.activity.text);
+                    await context.sendActivity(MessageFactory.suggestedActions(cardActions, 'Feeling tired or having little energy.'));
+                    value += 1;
+                    break;
+                case 6:
+                    user.score += parseInt(context.activity.text);
+                    await context.sendActivity(MessageFactory.suggestedActions(cardActions, 'Poor appetite or overeating.'));
+                    value += 1;
+                    break;
+                case 7:
+                    user.score += parseInt(context.activity.text);
+                    await context.sendActivity(MessageFactory.suggestedActions(cardActions, 'Feeling bad about yourself—or that you are a failure or have let yourself or your family down.'));
+                    value += 1;
+                    break;
+                case 8:
+                    user.score += parseInt(context.activity.text);
+                    await context.sendActivity(MessageFactory.suggestedActions(cardActions, 'Trouble concentrating on things such as reading the newspaper or watching television.'));
+                    value += 1;
+                    break;
+                case 9:
+                    user.score += parseInt(context.activity.text);
+                    await context.sendActivity(MessageFactory.suggestedActions(cardActions, 'Moving or speaking so slowly that other people could have noticed? Or the opposite—being so fidgety or restless that you have been moving around a lot more than usual.'));
+                    value += 1;
+                    break;
+                case 10:
+                    user.score += parseInt(context.activity.text);
+                    await context.sendActivity(MessageFactory.suggestedActions(cardActions, 'Thoughts that you would be better off dead or of hurting yourself in some way.'));
+                    value += 1;
+                    break;
+                case 11:
+                    user.score += parseInt(context.activity.text);
+                    await context.sendActivity(`Thanks for answering these questions ${ user.name }! Now you can ask me some questions or just talk to me about how you're feeling.`);
+                    value += 1;
+                    break;
+                default:
+                    await this.dialog.run(context, this.dialogState);
             }
 
             // By calling next() you ensure that the next BotHandler is run.

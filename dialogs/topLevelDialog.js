@@ -8,6 +8,8 @@ const WATERFALL_DIALOG = 'WATERFALL_DIALOG';
 const TEXT_PROMPT = 'TEXT_PROMPT';
 const NUMBER_PROMPT = 'NUMBER_PROMPT';
 
+global.globalValue = 0
+
 class TopLevelDialog extends ComponentDialog {
     constructor() {
         super(TOP_LEVEL_DIALOG);
@@ -149,6 +151,7 @@ class TopLevelDialog extends ComponentDialog {
 
         await stepContext.context.sendActivity(`Thanks for answering these questions ${ userProfile.name }! Now you can ask me some questions or just talk to me about how you're feeling.`);
 
+        globalValue = 1;
         // Exit the dialog, returning the collected user information.
         return await stepContext.endDialog(userProfile);
     }

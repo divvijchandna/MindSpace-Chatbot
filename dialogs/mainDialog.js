@@ -1,23 +1,33 @@
 const { ComponentDialog, DialogSet, DialogTurnStatus, WaterfallDialog } = require('botbuilder-dialogs');
 const { TopLevelDialog, TOP_LEVEL_DIALOG } = require('./topLevelDialog');
+const {
+    QnAMakerBaseDialog
+} = require('./qnamakerBaseDialog');
 
 const MAIN_DIALOG = 'MAIN_DIALOG';
 const WATERFALL_DIALOG = 'WATERFALL_DIALOG';
 const USER_PROFILE_PROPERTY = 'USER_PROFILE_PROPERTY';
+const QNAMAKER_BASE_DIALOG = 'qnamaker-base-dialog';
+
 
 class MainDialog extends ComponentDialog {
-    constructor(userState) {
+    /**
+     * Root dialog for this bot.
+     * @param {QnAMaker} qnaService A QnAMaker service object.
+     */
+    constructor(knowledgebaseId, authkey, host, userState) {
         super(MAIN_DIALOG);
         this.userState = userState;
         this.userProfileAccessor = userState.createProperty(USER_PROFILE_PROPERTY);
 
         this.addDialog(new TopLevelDialog());
-        this.addDialog(new WaterfallDialog(WATERFALL_DIALOG, [
-            this.initialStep.bind(this),
-            this.finalStep.bind(this)
-        ]));
-
-        this.initialDialogId = WATERFALL_DIALOG;
+        this.addDialog(new QnAMakerBaseDialog(knowledgebaseId, authkey, host));
+        this.initialDialogId = QNAMAKER_BASE_DIALOG
+        // this.addDialog(new WaterfallDialog(WATERFALL_DIALOG, [
+        //     this.initialStep.bind(this),
+        //     this.intermediateStep.bind(this),
+        //     this.finalStep.bind(this)
+        // ]));
     }
 
     /**
@@ -39,6 +49,10 @@ class MainDialog extends ComponentDialog {
 
     async initialStep(stepContext) {
         return await stepContext.beginDialog(TOP_LEVEL_DIALOG);
+    }
+
+    async intermediateStep(stepContext) {
+        return await stepContext.beginDialog(QNAMAKER_BASE_DIALOG);
     }
 
     async finalStep(stepContext) {
