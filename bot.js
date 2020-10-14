@@ -72,7 +72,7 @@ class MyBot extends ActivityHandler {
                 case 2:
                     user.name = context.activity.text;
                     await context.sendActivity(`${ context.activity.text }. That's a really nice name!`);
-                    await context.sendActivity(`To get started, Please answer the following questions by typing the corresponding number for each of the options. Over the last two weeks, how often have you been bothered by any of the following problems?`);
+                    await context.sendActivity(`To get started, please answer the following questions by selecting one of the given options. Over the last two weeks, how often have you been bothered by any of the following problems?`);
                     await context.sendActivity(MessageFactory.suggestedActions(cardActions, 'Little interest or pleasure in doing things.'));
                     value += 1;
                     break;
