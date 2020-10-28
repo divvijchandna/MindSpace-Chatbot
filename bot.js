@@ -62,6 +62,7 @@ class MyBot extends ActivityHandler {
 
             switch(value) {
                 case 0:
+                    user.score = 0;
                     await context.sendActivity(MessageFactory.suggestedActions(cardActions2, text2));
                     value += 1;
                     break;
@@ -98,27 +99,16 @@ class MyBot extends ActivityHandler {
                     break;
                 case 7:
                     user.score += parseInt(context.activity.text);
-                    await context.sendActivity(MessageFactory.suggestedActions(cardActions, 'Feeling bad about yourself—or that you are a failure or have let yourself or your family down.'));
-                    value += 1;
-                    break;
-                case 8:
-                    user.score += parseInt(context.activity.text);
-                    await context.sendActivity(MessageFactory.suggestedActions(cardActions, 'Trouble concentrating on things such as reading the newspaper or watching television.'));
-                    value += 1;
-                    break;
-                case 9:
-                    user.score += parseInt(context.activity.text);
-                    await context.sendActivity(MessageFactory.suggestedActions(cardActions, 'Moving or speaking so slowly that other people could have noticed? Or the opposite—being so fidgety or restless that you have been moving around a lot more than usual.'));
-                    value += 1;
-                    break;
-                case 10:
-                    user.score += parseInt(context.activity.text);
-                    await context.sendActivity(MessageFactory.suggestedActions(cardActions, 'Thoughts that you would be better off dead or of hurting yourself in some way.'));
-                    value += 1;
-                    break;
-                case 11:
-                    user.score += parseInt(context.activity.text);
-                    await context.sendActivity(`Thanks for answering these questions ${ user.name }! Now you can ask me some questions or just talk to me about how you're feeling.`);
+                    if (user.score > 10) {
+                        await context.sendActivity(`I'm sorry to hear that you've been going through such a tough time. Hopefully I can help you feel better. You can talk to me regarding the problems you're having or try using some other features on MindSpace to improve your mood.`);
+                    }
+                    else if (user.score > 5) {
+                        await context.sendActivity(`It looks like you had a few rough days over the last few weeks. You can always check in to MindSpace when you're feeling down and talk to me or use the other features on MindSpace. You can continue talking to me right now and hopefully I can help you out with any problems you are facing.`)
+                    }
+                    else {
+                        await context.sendActivity(`Happy to hear that you've been doing well over the last two weeks ${ user.name }! Now you can ask me some questions or just talk to me about how you're doing. You can also check out some other features on Mindspace.`)
+                    }
+                    // await context.sendActivity(`Thanks for answering these questions ${ user.name }! Now you can ask me some questions or just talk to me about how you're doing.`);
                     value += 1;
                     break;
                 default:
